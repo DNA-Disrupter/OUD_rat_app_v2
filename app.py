@@ -3,12 +3,23 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import gdown
+import os
 
-file_id = "1sRonWw-MuWNqHctz_VZJTWBOQfujS44f" 
-url = f"https://drive.google.com/uc?id={file_id}"
-output = "normalized_counts_long.csv"  # Change to your file type
-gdown.download(url, output, quiet=False)
+# ---------------------------
+# 1. Load the Data (with caching and download check)
+# ---------------------------
+@st.cache_data
+def load_data():
+    output = "normalized_counts_long.csv"
+    # Download only if the file doesn't exist
+    if not os.path.exists(output):
+        file_id = "1sRonWw-MuWNqHctz_VZJTWBOQfujS44f"
+        url = f"https://drive.google.com/uc?id={file_id}"
+        gdown.download(url, output, quiet=False)
+    df = pd.read_csv(output)
+    return df
 
+df = load_data()
 
 # ---------------------------
 # Helper Function: Darken a Hex Color
@@ -29,21 +40,20 @@ def darken_color(hex_color, factor=0.7):
 # ---------------------------
 # Define Treatment Group Color Mapping
 # ---------------------------
-# (Make sure these keys match the exact strings in your "GATC.D3" column.)
 color_map = {
-    "SALINE": "#1f77b4",  # Blue
-    "F-O": "#ff7f0e",  # Orange
-    "0 MG/KG": "#9467bd",  # Purple
-    "25 MG/KG": "#d62728",  # Red
-    "40 MG/KG": "#e377c2",  # Pink
-    "70 MG/KG": "#8c564b",  # Brown
+    "SALINE": "#1f77b4",        # Blue
+    "F-O": "#ff7f0e",           # Orange
+    "0 MG/KG": "#9467bd",       # Purple
+    "25 MG/KG": "#d62728",      # Red
+    "40 MG/KG": "#e377c2",      # Pink
+    "70 MG/KG": "#8c564b",      # Brown
     "40 MG/KG w/o SULB": "#2ca02c"  # Green
 }
 
 # ---------------------------
 # App Title and Description
 # ---------------------------
-st.title("Bulk RNA-seq OUD Data Visaulizer: Median-Ratio Normalization with DESeq2 Approach")
+st.title("Bulk RNA-seq OUD Data Visualizer: Median-Ratio Normalization with DESeq2 Approach")
 
 st.markdown(
     """
@@ -91,16 +101,6 @@ st.sidebar.header("Brain Region Settings")
 brain_region_options = ["NAc", "PFC", "VTA"]
 selected_brain_regions = st.sidebar.multiselect("Select brain regions:", options=brain_region_options, default=brain_region_options)
 view_mode = st.sidebar.radio("View brain regions:", options=["Combined", "Separated"])
-
-# ---------------------------
-# 1. Load the Data
-# ---------------------------
-@st.cache_data
-def load_data():
-    df = pd.read_csv("normalized_counts_long.csv")
-    return df
-
-df = load_data()
 
 # ---------------------------
 # 2. Select Gene from a Searchable Dropdown

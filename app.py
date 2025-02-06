@@ -13,7 +13,7 @@ def load_data():
     output = "normalized_counts_long.csv"
     # Download only if the file doesn't exist
     if not os.path.exists(output):
-        file_id = "1sRonWw-MuWNqHctz_VZJTWBOQfujS44f"
+        file_id = "1uPyoerHLoEw0LyrrcyDymNbvxMkj6Cq4"
         url = f"https://drive.google.com/uc?id={file_id}"
         gdown.download(url, output, quiet=False)
     df = pd.read_csv(output)
